@@ -62,4 +62,21 @@ curl -s https://spacs-rebuild.vercel.app/api/studies -H "Authorization: Bearer $
 The complete reverse-engineering write-up lives in [`docs/sPACS-full-documentation.md`](docs/sPACS-full-documentation.md).
 It is also served in-app at [`/docs`](https://spacs-rebuild.vercel.app/docs).
 
+## Data & durability
+
+The demo uses a **durable JSON store**: state is kept in a private GitHub gist and
+revalidated (ETag / 304) before every authenticated request, so writes survive
+Vercel's ephemeral serverless instances. Mutating endpoints persist **before**
+their response is delivered, which keeps write-then-read sequences consistent
+across instances.
+
+- Reading/writing the store requires two encrypted env vars in the Vercel project:
+  `SPACS_GH_TOKEN` (a GitHub token) and `SPACS_GIST_ID`. Without them the app
+  runs in in-memory mode (fine for local development).
+- Reset the demo data to a pristine seed at any time:
+
+```bash
+SPACS_GH_TOKEN=… SPACS_GIST_ID=… node scripts/reset-store.mjs
+```
+
 > Demo only. Patient data is synthetic. Not for clinical use. No PHI is stored.
