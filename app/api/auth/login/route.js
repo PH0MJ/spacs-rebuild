@@ -1,9 +1,11 @@
+import { hydrate } from "@/lib/db";
 import { getStore, userWithPermissions, issueToken } from "@/lib/store";
-import { json, err, parseBody } from "@/lib/api";
+import { json, err, parseBody, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
+  await hydrate();
   const store = getStore();
   const body = await parseBody(req);
   const username = String(body.username || "").trim();
@@ -15,5 +17,5 @@ export async function POST(req) {
     });
   }
   const token = issueToken(store, { userId: user.id });
-  return json({ token, user: userWithPermissions(store, user) });
+  return jsonP({ token, user: userWithPermissions(store, user) });
 }

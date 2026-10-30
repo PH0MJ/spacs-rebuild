@@ -1,10 +1,10 @@
-import { json, guard, parseBody, err } from "@/lib/api";
+import { json, guard, parseBody, err, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req, ctx) {
   const { id } = await ctx.params;
-  const g = guard(req, "Role.view");
+  const g = await guard(req, "Role.view");
   if (g.response) return g.response;
   const role = g.store.roles.find((r) => r.id === id);
   if (!role) return err(404, "Role not found.");
@@ -13,7 +13,7 @@ export async function GET(req, ctx) {
 
 export async function PUT(req, ctx) {
   const { id } = await ctx.params;
-  const g = guard(req, "Role.update");
+  const g = await guard(req, "Role.update");
   if (g.response) return g.response;
   const role = g.store.roles.find((r) => r.id === id);
   if (!role) return err(404, "Role not found.");
@@ -23,15 +23,15 @@ export async function PUT(req, ctx) {
   }
   if (body.name !== undefined) role.name = body.name;
   if (Array.isArray(body.permissions)) role.permissions = body.permissions;
-  return json({ data: role });
+  return jsonP({ data: role });
 }
 
 export async function DELETE(req, ctx) {
   const { id } = await ctx.params;
-  const g = guard(req, "Role.delete");
+  const g = await guard(req, "Role.delete");
   if (g.response) return g.response;
   const idx = g.store.roles.findIndex((r) => r.id === id);
   if (idx === -1) return err(404, "Role not found.");
   g.store.roles.splice(idx, 1);
-  return json({ status: "deleted" });
+  return jsonP({ status: "deleted" });
 }

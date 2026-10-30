@@ -1,11 +1,11 @@
 import { userWithPermissions } from "@/lib/store";
-import { json, guard, parseBody, err } from "@/lib/api";
+import { json, guard, parseBody, err, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req, ctx) {
   const { id } = await ctx.params;
-  const g = guard(req, "User.view");
+  const g = await guard(req, "User.view");
   if (g.response) return g.response;
   const user = g.store.users.find((u) => u.id === id);
   if (!user) return err(404, "User not found.");
@@ -14,7 +14,7 @@ export async function GET(req, ctx) {
 
 export async function PUT(req, ctx) {
   const { id } = await ctx.params;
-  const g = guard(req, "User.update");
+  const g = await guard(req, "User.update");
   if (g.response) return g.response;
   const { store } = g;
   const user = store.users.find((u) => u.id === id);
@@ -35,5 +35,5 @@ export async function PUT(req, ctx) {
   if (body.isActive !== undefined) user.isActive = !!body.isActive;
   if (Array.isArray(body.roles)) user.roles = body.roles;
   if (body.password) user.password = body.password;
-  return json({ data: userWithPermissions(store, user) });
+  return jsonP({ data: userWithPermissions(store, user) });
 }

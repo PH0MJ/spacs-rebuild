@@ -1,10 +1,10 @@
 import { getStore, ulid } from "@/lib/store";
-import { json, guard, parseBody, err } from "@/lib/api";
+import { json, guard, parseBody, err, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req) {
-  const g = guard(req, "StudyShare.create");
+  const g = await guard(req, "StudyShare.create");
   if (g.response) return g.response;
   const body = await parseBody(req);
   const study = g.store.studies.find((s) => s.studyInstanceUid === body.studyInstanceUid);
@@ -20,5 +20,5 @@ export async function POST(req) {
   };
   g.store.studyShares.push(share);
   if (study.report) study.report.studyShare = share;
-  return json({ data: share }, 201);
+  return jsonP({ data: share }, 201);
 }

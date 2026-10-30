@@ -2,8 +2,8 @@ import { json, guard, paginate } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export function GET(req) {
-  const g = guard(req, "Study.view");
+export async function GET(req) {
+  const g = await guard(req, "Study.view");
   if (g.response) return g.response;
   const { store } = g;
   const u = new URL(req.url);

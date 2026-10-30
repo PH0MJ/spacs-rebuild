@@ -1,11 +1,11 @@
 import { getStore, ulid } from "@/lib/store";
-import { json, guard, parseBody, err } from "@/lib/api";
+import { json, guard, parseBody, err, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req, ctx) {
   const { uid } = await ctx.params;
-  const g = guard(req, ["Report.finalize"]);
+  const g = await guard(req, ["Report.finalize"]);
   if (g.response) return g.response;
   const study = g.store.studies.find((s) => s.studyInstanceUid === uid);
   if (!study) return err(404, "Study not found.");
@@ -20,5 +20,5 @@ export async function POST(req, ctx) {
     reason: "Signed & finalized", createdAt: new Date().toISOString(), author: g.auth.user.name,
   });
   study.report.revisionsCount = g.store.reportRevisions[study.report.id].length;
-  return json({ data: study.report, share: study.report.studyShare || null });
+  return jsonP({ data: study.report, share: study.report.studyShare || null });
 }

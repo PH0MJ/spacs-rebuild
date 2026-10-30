@@ -1,10 +1,10 @@
 import { getStore, ulid } from "@/lib/store";
-import { json, guard, paginate, parseBody, err } from "@/lib/api";
+import { json, guard, paginate, parseBody, err, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export function GET(req) {
-  const ctx = guard(req, "Role.view");
+export async function GET(req) {
+  const ctx = await guard(req, "Role.view");
   if (ctx.response) return ctx.response;
   const { store } = ctx;
   const u = new URL(req.url);
@@ -19,7 +19,7 @@ export function GET(req) {
 }
 
 export async function POST(req) {
-  const ctx = guard(req, "Role.create");
+  const ctx = await guard(req, "Role.create");
   if (ctx.response) return ctx.response;
   const body = await parseBody(req);
   if (!body.name) return err(422, "The given data was invalid.", { name: ["The name field is required."] });
@@ -28,5 +28,5 @@ export async function POST(req) {
   }
   const role = { id: ulid(), name: body.name, permissions: Array.isArray(body.permissions) ? body.permissions : [], isSystem: false };
   ctx.store.roles.push(role);
-  return json({ data: role }, 201);
+  return jsonP({ data: role }, 201);
 }

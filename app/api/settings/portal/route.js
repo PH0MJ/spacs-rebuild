@@ -1,16 +1,16 @@
-import { json, guard } from "@/lib/api";
+import { json, guard, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export function GET(req) {
-  const g = guard(req, "PortalSetting.view");
+export async function GET(req) {
+  const g = await guard(req, "PortalSetting.view");
   if (g.response) return g.response;
   return json({ data: g.store.portalSetting });
 }
 
 // Accepts multipart/form-data (logo upload) or JSON.
 export async function POST(req) {
-  const g = guard(req, "PortalSetting.update");
+  const g = await guard(req, "PortalSetting.update");
   if (g.response) return g.response;
   const ct = req.headers.get("content-type") || "";
   let body = {};
@@ -32,5 +32,5 @@ export async function POST(req) {
   for (const k of ["title", "description", "footerText", "logoUrl"]) if (body[k] !== undefined) p[k] = body[k];
   if (body.redirectDelay !== undefined) p.redirectDelay = Number(body.redirectDelay) || 0;
   if (body.showStudyDetailsInQr !== undefined) p.showStudyDetailsInQr = !!body.showStudyDetailsInQr;
-  return json({ data: p });
+  return jsonP({ data: p });
 }

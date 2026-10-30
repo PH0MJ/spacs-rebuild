@@ -1,10 +1,10 @@
 import { getStore, ulid, CONSTANTS, userWithPermissions } from "@/lib/store";
-import { json, guard, can, paginate, parseBody, err } from "@/lib/api";
+import { json, guard, can, paginate, parseBody, err, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export function GET(req) {
-  const ctx = guard(req, "User.view");
+export async function GET(req) {
+  const ctx = await guard(req, "User.view");
   if (ctx.response) return ctx.response;
   const { store } = ctx;
   const u = new URL(req.url);
@@ -18,7 +18,7 @@ export function GET(req) {
 }
 
 export async function POST(req) {
-  const ctx = guard(req, "User.create");
+  const ctx = await guard(req, "User.create");
   if (ctx.response) return ctx.response;
   const { store } = ctx;
   const body = await parseBody(req);
@@ -37,5 +37,5 @@ export async function POST(req) {
     preference: { ...CONSTANTS.DEFAULT_PREFERENCE },
   };
   store.users.push(user);
-  return json({ data: userWithPermissions(store, user) }, 201);
+  return jsonP({ data: userWithPermissions(store, user) }, 201);
 }

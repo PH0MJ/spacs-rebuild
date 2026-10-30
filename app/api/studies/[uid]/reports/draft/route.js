@@ -1,5 +1,5 @@
 import { getStore, ulid } from "@/lib/store";
-import { json, guard, parseBody, err } from "@/lib/api";
+import { json, guard, parseBody, err, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -17,12 +17,12 @@ function ensureReport(ctx, uid) {
 
 export async function POST(req, ctx) {
   const { uid } = await ctx.params;
-  const g = guard(req, "Report.create");
+  const g = await guard(req, "Report.create");
   if (g.response) return g.response;
   const { error, study, report } = ensureReport(g, uid);
   if (error) return error;
   const body = await parseBody(req);
   report.content = body.content || "";
   report.status = "draft";
-  return json({ data: report, share: study.report.studyShare || null });
+  return jsonP({ data: report, share: study.report.studyShare || null });
 }

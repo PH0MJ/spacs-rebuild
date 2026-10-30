@@ -1,10 +1,10 @@
-import { json, guard, parseBody, err } from "@/lib/api";
+import { json, guard, parseBody, err, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req, ctx) {
   const { id } = await ctx.params;
-  const g = guard(req, ["PrintTemplate.viewOwn", "PrintTemplate.viewAny"]);
+  const g = await guard(req, ["PrintTemplate.viewOwn", "PrintTemplate.viewAny"]);
   if (g.response) return g.response;
   const tpl = g.store.printTemplates.find((t) => t.id === id);
   if (!tpl) return err(404, "Print template not found.");
@@ -13,7 +13,7 @@ export async function GET(req, ctx) {
 
 export async function POST(req, ctx) {
   const { id } = await ctx.params;
-  const g = guard(req, ["PrintTemplate.updateOwn", "PrintTemplate.updateAny"]);
+  const g = await guard(req, ["PrintTemplate.updateOwn", "PrintTemplate.updateAny"]);
   if (g.response) return g.response;
   const tpl = g.store.printTemplates.find((t) => t.id === id);
   if (!tpl) return err(404, "Print template not found.");
@@ -24,15 +24,15 @@ export async function POST(req, ctx) {
   if (body.includePortalQr !== undefined) tpl.includePortalQr = !!body.includePortalQr;
   if (body.isDefault !== undefined) tpl.isDefault = !!body.isDefault;
   if (body.userId !== undefined) tpl.userId = body.userId || null;
-  return json({ data: tpl });
+  return jsonP({ data: tpl });
 }
 
 export async function DELETE(req, ctx) {
   const { id } = await ctx.params;
-  const g = guard(req, ["PrintTemplate.deleteOwn", "PrintTemplate.deleteAny"]);
+  const g = await guard(req, ["PrintTemplate.deleteOwn", "PrintTemplate.deleteAny"]);
   if (g.response) return g.response;
   const idx = g.store.printTemplates.findIndex((t) => t.id === id);
   if (idx === -1) return err(404, "Print template not found.");
   g.store.printTemplates.splice(idx, 1);
-  return json({ status: "deleted" });
+  return jsonP({ status: "deleted" });
 }

@@ -1,10 +1,10 @@
 import { getStore, ulid } from "@/lib/store";
-import { json, guard, parseBody, err } from "@/lib/api";
+import { json, guard, parseBody, err, jsonP } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export function GET(req) {
-  const g = guard(req, ["PrintTemplate.listAny", "PrintTemplate.listOwn"]);
+export async function GET(req) {
+  const g = await guard(req, ["PrintTemplate.listAny", "PrintTemplate.listOwn"]);
   if (g.response) return g.response;
   const u = new URL(req.url);
   const search = (u.searchParams.get("search") || "").toLowerCase().trim();
@@ -17,7 +17,7 @@ export function GET(req) {
 }
 
 export async function POST(req) {
-  const g = guard(req, ["PrintTemplate.createOwn", "PrintTemplate.createAny"]);
+  const g = await guard(req, ["PrintTemplate.createOwn", "PrintTemplate.createAny"]);
   if (g.response) return g.response;
   const body = await parseBody(req);
   if (!body.name) return err(422, "The given data was invalid.", { name: ["The name field is required."] });
@@ -27,5 +27,5 @@ export async function POST(req) {
     userId: body.userId || (g.auth.user.permissions.includes("PrintTemplate.createAny") ? null : g.auth.user.id),
   };
   g.store.printTemplates.push(tpl);
-  return json({ data: tpl }, 201);
+  return jsonP({ data: tpl }, 201);
 }

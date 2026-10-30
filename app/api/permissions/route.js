@@ -3,8 +3,8 @@ import { json, guard } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
-export function GET(req) {
-  const ctx = guard(req, null);
+export async function GET(req) {
+  const ctx = await guard(req, null);
   if (ctx.response) return ctx.response;
   // Full permission universe for the Role matrix.
   const store = getStore();
