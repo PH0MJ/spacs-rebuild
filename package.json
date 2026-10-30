@@ -1,12 +1,13 @@
-{
+﻿{
   "name": "spacs-rebuild",
   "version": "1.0.0",
   "private": true,
-  "description": "sPACS — open-source rebuild of a hospital PACS / radiology portal (Next.js full-stack)",
+  "description": "sPACS - open-source rebuild of a hospital PACS / radiology portal (Next.js full-stack)",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "verify:api": "node scripts/verify-api.mjs"
   },
   "dependencies": {
     "next": "^15.5.28",

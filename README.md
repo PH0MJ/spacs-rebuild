@@ -35,6 +35,28 @@ npm i -g vercel
 vercel --prod
 ```
 
+## Verify the API
+
+Every endpoint is tested against the live deployment:
+
+```bash
+npm run verify:api
+# or against your own instance:
+BASE=http://localhost:3000 npm run verify:api
+```
+
+All API routes require a Bearer token **except** the public ones (`/api/portal-settings`,
+`/api/auth/login`, `/api/auth/demo-session`, `/api/study-shares/:id/generate-token`).
+Opening a protected route directly in a browser (with no token) correctly returns
+`401 {"message":"Unauthenticated."}` — that is auth working, not a missing API.
+
+Get a token and try it:
+
+```bash
+TOKEN=$(curl -s -X POST https://spacs-rebuild.vercel.app/api/auth/demo-session | jq -r .token)
+curl -s https://spacs-rebuild.vercel.app/api/studies -H "Authorization: Bearer $TOKEN"
+```
+
 ## Docs
 
 The complete reverse-engineering write-up lives in [`docs/sPACS-full-documentation.md`](docs/sPACS-full-documentation.md).
